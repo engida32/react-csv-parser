@@ -1,10 +1,7 @@
 import React from "react";
 import { ArrowDownToLine } from "lucide-react";
-
-interface Props {
-  metrics: { processingTimeMs: number; departmentCount: number };
-  downloadUrl: string;
-}
+import type { Props } from "../types";
+const API_BASE = import.meta.env.VITE_API_ENDPOINT;
 
 const UploadResult: React.FC<Props> = ({ metrics, downloadUrl }) => {
   return (
@@ -16,7 +13,7 @@ const UploadResult: React.FC<Props> = ({ metrics, downloadUrl }) => {
         <strong>Processing Time:</strong> {metrics.processingTimeMs} ms
       </p>
       <a
-        href={downloadUrl}
+        href={`${API_BASE}${downloadUrl}`}
         download
         target="_blank"
         rel="noopener noreferrer"

@@ -1,31 +1,31 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import UploadDropzone from "./components/UploadDropzone";
 import UploadResult from "./components/UploadResult";
 import { uploadCSV } from "./api/upload";
+import toast from "react-hot-toast";
+import type { Metrics } from "./types";
 
 function App() {
   const [file, setFile] = useState<File | null>(null);
   const [uploading, setUploading] = useState(false);
-  const [metrics, setMetrics] = useState<{
-    processingTimeMs: number;
-    departmentCount: number;
-  } | null>(null);
+  const [metrics, setMetrics] = useState<Metrics | null>(null);
   const [resultUrl, setResultUrl] = useState("");
 
   const handleUpload = async () => {
     if (!file) return;
-
-    setUploading(true);
     try {
-      const res = await uploadCSV(file);
+      setUploading(true);
+      const result = await uploadCSV(file);
+      setResultUrl(result.downloadUrl);
       setMetrics({
-        processingTimeMs: res.processingTimeMs,
-        departmentCount: res.departmentCount,
+        processingTimeMs: result.processingTimeMs,
+        departmentCount: result.departmentCount,
       });
-      setResultUrl(res.downloadUrl);
-    } catch (err) {
-      alert("Upload failed. Please check your file or server.");
-      console.error(err);
+
+      toast.success("CSV processed successfully!");
+    } catch (error) {
+      toast.error("Failed to process file");
+      console.error(error);
     } finally {
       setUploading(false);
     }
@@ -51,6 +51,9 @@ function App() {
           >
             {uploading ? "Processing..." : "Upload & Process"}
           </button>
+        )}
+        {uploading && (
+          <p className="mt-4 text-sm text-gray-500">Processing your file...</p>
         )}
 
         {metrics && resultUrl && (
